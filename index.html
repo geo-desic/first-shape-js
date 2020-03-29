@@ -1,0 +1,59 @@
+<html>
+   <head>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
+      <link rel="stylesheet" type="text/css" href="style.css">
+      <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+   </head>
+   <body>
+      <div id="game_container" class="fs-game">
+         <p id="game_information" class="fs-text">Player to move: X</p>
+         <div id="board_container" class="fs-board"></div>
+         <div class="fs-options">
+            <table align="center">
+               <tr>
+                  <td>
+                     <label for="game_type">Game Type</label>
+                  </td>
+                  <td>
+                     <select id="game_type">
+                        <option value="ttt">Standard Tic Tac Toe</option>
+                        <option value="ttt_4" selected>4x4 Tic Tac Toe With Squares</option>
+                     </select>
+                  </td>
+               </tr>
+               <tr>
+                  <td>
+                     <label for="player_type_1">Player 1</label>
+                  </td>
+                  <td>
+                     <select id="player_type_1">
+                        <option value="human">Human</option>
+                        <option value="ai" selected>AI</option>
+                     </select>
+                  </td>
+               </tr>
+               <tr>
+                  <td>
+                     <label for="player_type_2">Player 2</label>
+                  </td>
+                  <td>
+                     <select id="player_type_2">
+                        <option value="human">Human</option>
+                        <option value="ai">AI</option>
+                     </select>
+                  </td>
+               </tr>
+               <tr style="padding-top: 20px;">
+                  <td>
+                  </td>
+                  <td>
+                     <button type="button" onclick="newGame()">New Game</button>
+                  </td>
+            </table>
+         </div>
+      </div>
+   </body>
+   <script type="text/javascript" src="first_shape.js"></script>
+   <script type="text/javascript" src="script.js"></script>
+</html>

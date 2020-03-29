@@ -1,0 +1,57 @@
+body {
+   font-family: 'Permanent Marker', cursive;
+   width: 100%;
+}
+
+td.win {
+   color: green;
+}
+
+.fs-game {
+   margin: auto;
+   text-align: center;
+   width: 480px;
+}
+
+.fs-text {
+   font-size: 30px;
+}
+
+.fs-board {
+   width: 100%;
+}
+
+.fs-board table {
+   margin: auto;
+   cellspacing: 0px;
+}
+
+.fs-board table td {
+   border: 1px solid;
+   border-radius: 10px;
+   height: 120px;
+   width: 120px;
+   text-align: center;
+   valign: center;
+   font-size: 80px;
+}
+
+.fs-options table tr td {
+   padding: 10px;
+}
+
+@media screen and (max-width: 600px) {
+   .fs-game {
+      width: 320px;
+   }
+
+   .fs-text {
+      font-size: 4vw;
+   }
+
+   .fs-board table td {
+      height: 15vw;
+      width: 15vw;
+      font-size: 10vw;
+   }
+}
