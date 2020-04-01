@@ -1,5 +1,5 @@
 # First Shape (Javascript)
-This is a fairly simple project that includes two common games with AI's powered entirely by models trained from neural networks. Only basic html and javascript knowledge is required to understand the code.
+This is a fairly simple project that includes two common games with AI's powered entirely by neural networks. Only basic html and javascript knowledge is required to understand the code.
 
 This code is currently hosted using GitHub Pages, so try it out [here](https://geo-desic.github.io/first-shape-js).
 
@@ -8,6 +8,7 @@ Create a site using any web server and make the contents of this repository avai
 
 ## Background and Motivation
 This project was created as part of a larger initiative to:
+
 - Learn some game theory
 - Learn how strong AI's are designed
 - Learn how to design an AI that it is easy to understand and use
@@ -99,11 +100,11 @@ Game | Unique Board States
 Once the necessary data was generated, the models were trained using the board representation defined above as input and the score as output. [TensorFlow](https://www.tensorflow.org) was the machine learning platform used which makes it extremely easy to save models for use in javascript. While the model design and training code isn't included here, it was not very complicated. Both contained 2 to 3 two dimensional convolutional layers followed by 2 to 3 dense layers. These may not be optimal, but worked well enough to achieve the desired goal of strong play.
 
 #### AI Strength
-The AI for 3x3 Tic Tac Toe is believed to be perfect (#). The AI for 4x4 Tic Tac Toe With Squares is strong but not perfect. Given the large size of the dataset, the model training process took a while particularly on the older hardware used. A future goal is to tweak the model a bit and retrain on upgraded hardware hopefully making it perfect as well.
+The AI for 3x3 Tic Tac Toe is believed to be perfect (#). The AI for 4x4 Tic Tac Toe With Squares is strong but not perfect. Given the large size of the dataset, the model training process took a while on the older hardware used. A future goal is to tweak the model a bit and retrain on upgraded hardware hopefully making it perfect as well.
 
 (#) This relies upon the assumption that the datasets, [ttt_zip](https://github.com/geo-desic/public-data/blob/master/first-shape/ttt.zip) and [ttt_4_sq.zip](https://github.com/geo-desic/public-data/blob/master/first-shape/ttt_4_sq.zip), used to train the models were both entirely accurate and comprehensive (i.e. include all unique board states). This is believed to be true, however it should not be difficult to independently verify.
 
-Statistics were gathered during the model training process shown below. The most important of these is maximum absolute error. This is the largest absolute difference between an actual and predicted score spanning the entire dataset. Therefore all predictions are contained in an interval of the form (N - e, N + e) where e is the maximum absolute error and N is an integer (all actual scores are integers). As long as e is small enough, less than 0.5, all of these intervals are disjoint and the actual score can be determined from the prediction simply by rounding to the nearest integer. This makes the model a perfect predictor and the AI will play perectly. The maximum absolute error for the 3x3 Tic Tac Toe model is well below this threshold.
+Statistics were gathered during the model training process shown below. The most important of these is maximum absolute error. This is the largest absolute difference between an actual and predicted score spanning the entire dataset. Therefore all predictions are contained in an interval of the form [N - e, N + e] where e is the maximum absolute error and N is an integer (all actual scores are integers). As long as e is small enough, less than 0.5, all of these intervals are disjoint and the actual score can be determined from the prediction simply by rounding to the nearest integer. This makes the model a perfect predictor and the AI will play perfectly. The maximum absolute error for the 3x3 Tic Tac Toe model is well below this threshold.
 
 Model | Maximum Absolute Error | [MAE](https://en.wikipedia.org/wiki/Mean_absolute_error) | [MSE](https://en.wikipedia.org/wiki/Mean_squared_error)
 ----- | ---------------------- | ------------------- | ------------------
