@@ -100,7 +100,7 @@ Game | Unique Board States
 Once the necessary data was generated, the models were trained using the board representation defined above as input and the score as output. [TensorFlow](https://www.tensorflow.org) was the machine learning platform used which makes it extremely easy to save models for use in javascript. While the model design and training code isn't included here, it was not very complicated. Both contained 2 to 3 two dimensional convolutional layers followed by 2 to 3 dense layers. These may not be optimal, but worked well enough to achieve the desired goal of strong play.
 
 #### AI Strength
-The AI for 3x3 Tic Tac Toe is believed to be perfect (#). The AI for 4x4 Tic Tac Toe With Squares is strong but not perfect. Given the large size of the dataset, the model training process took a while especially on the older hardware used. A future goal is to tweak the model a bit, without significantly increasing the resultant file size, and retrain on upgraded hardware hopefully making it perfect as well.
+The AI for 3x3 Tic Tac Toe is believed to be perfect (#). The AI for 4x4 Tic Tac Toe With Squares is strong but not perfect. Given the large size of the dataset, the model training process took a while on the older hardware used. A future goal is to tweak the model a bit and retrain on upgraded hardware hopefully making it perfect as well.
 
 (#) This relies upon the assumption that the datasets, [ttt_zip](https://github.com/geo-desic/public-data/blob/master/first-shape/ttt.zip) and [ttt_4_sq.zip](https://github.com/geo-desic/public-data/blob/master/first-shape/ttt_4_sq.zip), used to train the models were both entirely accurate and comprehensive (i.e. include all unique board states). This is believed to be true, however it should not be difficult to independently verify.
 
@@ -111,8 +111,8 @@ Model | Maximum Absolute Error | [MAE](https://en.wikipedia.org/wiki/Mean_absolu
 ttt_model | 0.0897 | 0.0014 | 0.00001
 
 ## Why is this interesting?
-- The AI code is extremely simple: use the trained model to predict the score after all valid moves and choose a move that results in the "best" score (i.e. highest score for player 1 or lowest score for player 2)
-  - Note that a "best move" is not necessarily unique. There may be multple moves that result in board states with the same actual score. So, the code included in this project identifies all moves that result in the best score and randomly picks one of those. This allows for some randomization in AI without hindering its strength.
+- The AI code is extremely simple: use the trained model to predict the score after all valid moves and choose a move that results in the highest score (player 1) or lowest score (player 2)
+  - Note that a "best move" is not necessarily unique. There may be multple moves that result in board states with the same actual score. So, the code included in this project identifies all moves that result in the highest/lowest score and randomly picks one of those. This allows for randomization in AI without hindering its strength.
 - These games are run entirely in the browser (no server side code execution or integration)
 - While common brute force approaches to game AI such as the [minimax](https://en.wikipedia.org/wiki/Minimax) algorithm are extremely resource (CPU) intensive during game play and require highly optimized code, this approach does not
   - One way to think about it is most of that complex analysis was performed prior to game play and "trained" into the models

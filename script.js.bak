@@ -66,9 +66,7 @@ class AiPlayer {
             if (fsGame.validMove(r, c)) {
                let i = board.columns * r + c;
                locArrayPlayers[i] = this.piece;
-               let modelInput = locArrayPlayersToModelInput(locArrayPlayers);
-               let evaluation = this.model.predict(modelInput).dataSync()[0];
-               modelInput.dispose();
+               let evaluation = this.model.predict(locArrayPlayersToModelInput(locArrayPlayers)).dataSync()[0];
                if (currentGame.gameType === "ttt") {
                   evaluation = Math.round(evaluation);
                }
@@ -176,7 +174,8 @@ function boardToLocArrayPlayers() {
 }
 
 function locArrayPlayersToModelInput(locArrayPlayers) {
-   return tf.tensor(locArrayPlayers, [1, currentGame.fsGame.board.size()]);
+   let tensor = tf.tensor(locArrayPlayers, [1, currentGame.fsGame.board.size()]);
+   return tensor;
 }
 
 function performAiMoves() {
@@ -200,14 +199,6 @@ function setPlayerToMove() {
 async function loadModelsAsync(path) {
    modelTtt = await tf.loadLayersModel('ttt_model/model.json');
    modelTtt4 = await tf.loadLayersModel('ttt_4_model/model.json');
-   
-   // warm up models
-   const zeros9 = tf.zeros([1, 9]);
-   const zeros16 = tf.zeros([1, 16]);
-   modelTtt.predict(zeros9);
-   modelTtt4.predict(zeros16);
-   zeros9.dispose();
-   zeros16.dispose();
 }
 
 function loadModels() {
