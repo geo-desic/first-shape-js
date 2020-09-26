@@ -118,6 +118,8 @@ function newGame() {
             let tableData = document.createElement('td');
             tableData.addEventListener("click", locationClicked);
             tableData.id = LOCATION_ID_PREFIX + r + "_" + c;
+            tableData.setAttribute("data-row", r);
+            tableData.setAttribute("data-column", c);
             tableRow.appendChild(tableData);
          }
       }
@@ -129,10 +131,8 @@ function newGame() {
 
 function locationClicked() {
    if (!preventUserActions) {
-      let idSuffix = this.id.substr(LOCATION_ID_PREFIX.length);
-      let tokens = idSuffix.split("_");
-      let row = tokens[0];
-      let column = tokens[1];
+      let row = this.dataset.row;
+      let column = this.dataset.column;
       let fsGame = currentGame.fsGame;
       if (currentGame.aiPlayer() === null && fsGame.validMove(row, column)) {
          let piece = fsGame.pieceToMove;
