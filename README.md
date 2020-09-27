@@ -4,7 +4,7 @@ This is a fairly simple project that includes two common games with AI's powered
 This code is currently hosted using GitHub Pages, so try it out [here](https://geo-desic.github.io/first-shape-js).
 
 ## Installation
-Create a site using any web server and make the contents of this repository available to it. Make sure the default page is set to index.html.
+Make the contents of this repository available to any web server capable of serving static files and make sure the default page is set to index.html.
 
 ## Background and Motivation
 This project was created as part of a larger initiative to:
@@ -16,7 +16,7 @@ This project was created as part of a larger initiative to:
 
 The name First Shape was chosen as a general term to represent any board game where:
 
-- Each player has a single piece type
+- Each player has a single unique piece type
 - Pieces cannot be moved/removed once played
 - The objective is to be the first player to form one of the "winning" shapes on the board with their pieces
 
@@ -41,13 +41,14 @@ A separate project was used to create the data used to train the neural networks
 ### Board Representation and Score
 Board states are represented as an array of integers: 0, 1, or 2. The length is the number of locations on the board (e.g. 9 for 3x3 Tic Tac Toe) and the value is the player # associated with the board location, or zero if the location is empty.
 
+The score for any leaf (final) board state is defined below where N > 0 and N - 1 is the number of empty locations on the board.
 Score | Definition
 ----- | ----------
 0 | draw
 +N | win for player 1
 -N | win for player 2
 
-where N > 0 and N - 1 is the number of empty locations on the board
+The score for all non-leaf states is defined by assuming perfect play from both players. That is, the final state score that is "best" for both players (i.e. both maximal for player 1 and minimal for player 2).
 
 #### Examples:
 
@@ -63,7 +64,7 @@ Board = [2, 1, 2, 1, 2, 1, 1, 2, 1]
 ---------------------------
 __Win: Player 1__
 
-Score = 1
+Score = 1 (0 empty locations)
 
 Board = [1, 1, 1, 1, 2, 2, 2, 2, 1]
 
@@ -72,16 +73,16 @@ Board = [1, 1, 1, 1, 2, 2, 2, 2, 1]
 ---------------------------
 __Win: Player 2__
 
-Score = -2
+Score = -2 (1 empty location)
 
 Board = [2, 1, 0, 1, 2, 1, 1, 2, 2]
 
 ![Example 3](images/ex_3.png "Win: Player 2")
 
 ---------------------------
-__Forced Win: Player 1__
+__Forced Win: Player 1__ (in 2 moves)
 
-Score = 3
+Score = 3 (2 empty locations after 2 moves)
 
 Board = [1, 2, 0, 1, 1, 2, 0, 0, 0]
 
