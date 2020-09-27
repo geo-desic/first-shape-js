@@ -48,7 +48,7 @@ Score | Definition
 +N | win for player 1
 -N | win for player 2
 
-The score for all non-leaf states is defined by assuming perfect play from both players. That is, the final state score that is "best" for both players (i.e. both maximal for player 1 and minimal for player 2).
+The score for any non-leaf state is defined by the final state score that is optimal both players. That is, the final state score that is both maximal for player 1 and minimal for player 2 (i.e. perfect play).
 
 #### Examples:
 
@@ -64,27 +64,27 @@ Board = [2, 1, 2, 1, 2, 1, 1, 2, 1]
 ---------------------------
 __Win: Player 1__
 
-Score = 1 (0 empty locations)
+Score: 1 (0 empty locations)
 
-Board = [1, 1, 1, 1, 2, 2, 2, 2, 1]
+Board: [1, 1, 1, 1, 2, 2, 2, 2, 1]
 
 ![Example 2](images/ex_2.png "Win: Player 1")
 
 ---------------------------
 __Win: Player 2__
 
-Score = -2 (1 empty location)
+Score: -2 (1 empty location)
 
-Board = [2, 1, 0, 1, 2, 1, 1, 2, 2]
+Board: [2, 1, 0, 1, 2, 1, 1, 2, 2]
 
 ![Example 3](images/ex_3.png "Win: Player 2")
 
 ---------------------------
-__Forced Win: Player 1__ (in 2 moves)
+__Win: Player 1__ (in 2 moves)
 
-Score = 3 (2 empty locations after 2 moves)
+Score: 3 (2 empty locations after 2 moves)
 
-Board = [1, 2, 0, 1, 1, 2, 0, 0, 0]
+Board: [1, 2, 0, 1, 1, 2, 0, 0, 0]
 
 ![Example 4](images/ex_4.png "Forced Win: Player 1")
 
@@ -105,7 +105,7 @@ The AI for 3x3 Tic Tac Toe is believed to be perfect (#). The AI for 4x4 Tic Tac
 
 (#) This relies upon the assumption that the datasets, [ttt_zip](https://github.com/geo-desic/public-data/blob/master/first-shape/ttt.zip) and [ttt_4_sq.zip](https://github.com/geo-desic/public-data/blob/master/first-shape/ttt_4_sq.zip), used to train the models were both entirely accurate and comprehensive (i.e. include all unique board states). This is believed to be true, however it should not be difficult to independently verify.
 
-Statistics were gathered during the model training process shown below. The most important of these is maximum absolute error. This is the largest absolute difference between an actual and predicted score spanning the entire dataset. Therefore all predictions are contained in an interval of the form [N - e, N + e] where e is the maximum absolute error and N is an integer (all actual scores are integers). As long as e is small enough, less than 0.5, all of these intervals are disjoint and the actual score can be determined from the prediction simply by rounding to the nearest integer. This makes the model a perfect predictor and the AI will play perfectly. The maximum absolute error for the 3x3 Tic Tac Toe model is well below this threshold.
+Statistics were gathered during the model training process shown below. With respect to proving perfect play, the most important of these is maximum absolute error. This is the largest absolute difference between an actual and predicted score spanning the entire dataset. Therefore all predictions are contained in an interval of the form [N - e, N + e] where e is the maximum absolute error and N is an integer (all actual scores are integers). As long as e is small enough, less than 0.5, all of these intervals are disjoint and the actual score can be determined from the prediction simply by rounding to the nearest integer. This makes the model a perfect predictor and the AI will play perfectly. The maximum absolute error for the 3x3 Tic Tac Toe model is well below this threshold.
 
 Model | Maximum Absolute Error | [MAE](https://en.wikipedia.org/wiki/Mean_absolute_error) | [MSE](https://en.wikipedia.org/wiki/Mean_squared_error)
 ----- | ---------------------- | ------------------- | ------------------
