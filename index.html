@@ -10,7 +10,7 @@
         <p id="game_information" class="fs-text">Loading...</p>
         <div id="board_container" class="fs-board"></div>
         <div class="fs-options">
-            <table align="center">
+            <table>
                 <tr>
                     <td>
                         <label for="game_type">Game Type</label>
@@ -24,24 +24,26 @@
                 </tr>
                 <tr>
                     <td>
-                        <label for="player_type_1">Player 1</label>
+                        <label for="misere">Misere</label>
                     </td>
                     <td>
-                        <select id="player_type_1">
-                            <option value="human">Human</option>
-                            <option value="ai" selected>AI</option>
-                        </select>
+                        <input type="checkbox" id="misere" />
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <label for="player_type_2">Player 2</label>
+                        <label for="ai_player_1">AI Player 1</label>
                     </td>
                     <td>
-                        <select id="player_type_2">
-                            <option value="human">Human</option>
-                            <option value="ai">AI</option>
-                        </select>
+                        <input type="checkbox" id="ai_player_1" checked />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="ai_player_2">AI Player 2</label>
+                    </td>
+                    <td>
+                        <input type="checkbox" id="ai_player_2" />
                     </td>
                 </tr>
                 <tr style="padding-top: 20px;">

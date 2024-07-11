@@ -3,6 +3,10 @@ body {
    width: 100%;
 }
 
+td.loss {
+   color: red;
+}
+
 td.win {
    color: green;
 }
@@ -23,7 +27,6 @@ td.win {
 
 .fs-board table {
    margin: auto;
-   cellspacing: 0px;
 }
 
 .fs-board table td {
@@ -32,8 +35,12 @@ td.win {
    height: 120px;
    width: 120px;
    text-align: center;
-   valign: center;
    font-size: 80px;
+}
+
+.fs-options table {
+   margin-left: auto;
+   margin-right: auto;
 }
 
 .fs-options table tr td {

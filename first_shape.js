@@ -55,7 +55,7 @@ class FsLocation {
         this.column = column;
         this.piece = piece;
         this.row = row;
-        this.winConditions = [];
+        this.endConditions = [];
     }
 }
 
@@ -79,7 +79,7 @@ class FsBoard {
     }
 }
 
-class FsWinCondition {
+class FsEndCondition {
     constructor() {
         this.locations = [];
         this.firstPieceToFill = null;
@@ -89,28 +89,29 @@ class FsWinCondition {
 }
 
 class FsGame {
-    constructor(board, shapes) {
+    constructor(board, shapes, isMisere = false) {
         this.board = board;
+        this.endCondition = null;
+        this.endConditions = [];
+        this.isMisere = isMisere;
         this.moves = [];
         this.pieceToMove = 1;
         this.shapes = shapes;
         this.state = -1; // -1: in progress; 0: draw; 1: player 1 won; 2: player 2 won
-        this.winConditions = [];
-        this.winCondition = null;
         for (let shape of shapes) {
             for (let r = 0; r < board.rows - shape.rows + 1; r++) {
                 for (let c = 0; c < board.columns - shape.columns + 1; c++) {
-                    let winCondition = new FsWinCondition();
+                    let endCondition = new FsEndCondition();
                     for (let rs = 0; rs < shape.rows; rs++) {
                         for (let cs = 0; cs < shape.columns; cs++) {
                             if (shape.locations[rs][cs] === true) {
                                 let loc = board.locations[r + rs][c + cs];
-                                loc.winConditions.push(winCondition);
-                                winCondition.locations.push(loc);
+                                loc.endConditions.push(endCondition);
+                                endCondition.locations.push(loc);
                             }
                         }
                     }
-                    this.winConditions.push(winCondition);
+                    this.endConditions.push(endCondition);
                 }
             }
         }
@@ -122,22 +123,23 @@ class FsGame {
             loc.piece = this.pieceToMove;
             const move = { row: row, column: column };
             this.moves.push(move);
-            let won = false;
-            for (let winCondition of loc.winConditions) {
-                winCondition.fillCount++;
-                if (winCondition.fillCount === 1) {
-                    winCondition.firstPieceToFill = this.pieceToMove;
-                } else if (winCondition.firstPieceToFill === this.pieceToMove) {
-                    if (!winCondition.blocked && winCondition.fillCount === winCondition.locations.length) {
-                        won = true;
-                        this.winCondition = winCondition;
+            let endConditionReached = false;
+            for (let endCondition of loc.endConditions) {
+                endCondition.fillCount++;
+                if (endCondition.fillCount === 1) {
+                    endCondition.firstPieceToFill = this.pieceToMove;
+                } else if (endCondition.firstPieceToFill === this.pieceToMove) {
+                    if (!endCondition.blocked && endCondition.fillCount === endCondition.locations.length) {
+                        endConditionReached = true;
+                        this.endCondition = endCondition;
                     }
                 } else {
-                    winCondition.blocked = true;
+                    endCondition.blocked = true;
                 }
             }
-            if (won) {
-                this.state = this.pieceToMove;
+            let nextPieceToMove = (this.pieceToMove >= 2) ? 1 : this.pieceToMove + 1;
+            if (endConditionReached) {
+                this.state = this.isMisere ? nextPieceToMove : this.pieceToMove;
             } else if (this.moves.length === this.board.size()) {
                 this.state = 0; // draw
             }

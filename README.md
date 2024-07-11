@@ -18,7 +18,7 @@ The name First Shape was chosen as a general term to represent any board game wh
 
 - Each player has a single unique piece type
 - Pieces cannot be moved/removed once played
-- The objective is to be the first player to form one of the "winning" shapes on the board with their pieces
+- The objective is (or in the misere version <strong>is not</strong>) to be the first player to form one of the "winning" shapes on the board with their pieces
 
 #### Examples:
 - [Tic Tac Toe](https://en.wikipedia.org/wiki/Tic-tac-toe)
@@ -37,6 +37,10 @@ The winning shapes for the games above are mostly horizontal, vertical, and diag
 - [ttt_zip](https://github.com/geo-desic/public-data/blob/master/first-shape/ttt.zip) and [ttt_4_sq.zip](https://github.com/geo-desic/public-data/blob/master/first-shape/ttt_4_sq.zip) contain the data used to train the neural networks
 
 ## AI Information
+Neural network models were created for the standard (non-misere) versions of:
+- Tic Tac Toe
+- 4x4 Tic Tac Toe With Squares
+
 A separate project was used to create the data used to train the neural networks. That project used a [Negamax](https://en.wikipedia.org/wiki/Negamax) search to assign a "score" to unique board states. The score is used to determine whether the board state represents a win, loss, or draw assuming perfect play from all players. One common practice is to assign score values from the first player's perspective using the integers: 1 (win), 0 (draw), and -1 (loss). This is similar to the approach used, but modified slightly to allow the score to contain a bit more information and make it easy to design an AI that would not only try to win, but also do so in as few moves as possible.
 
 ### Board Representation and Score

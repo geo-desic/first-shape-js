@@ -8,32 +8,24 @@ var modelTtt4 = null;
 var preventUserActions = false;
 
 class Game {
-    constructor(gameType, playerType1, playerType2) {
+    constructor(gameType, isMisere, isAiPlayer1, isAiPlayer2) {
         this.gameType = gameType;
-        let model = null;
-        if (playerType1 === "ai" || playerType2 === "ai") {
-            if (gameType === "ttt") {
-                model = modelTtt;
-            } else if (gameType === "ttt_4") {
-                model = modelTtt4;
-            } else {
-                throw "Unsupported game type";
-            }
-        }
-        this.playerType1 = playerType1;
-        this.playerType2 = playerType2;
+        this.isMisere = isMisere;
+        this.isAiPlayer1 = isAiPlayer1;
+        this.isAiPlayer2 = isAiPlayer2;
         if (gameType === "ttt") {
-            this.fsGame = new FsGame(new FsBoard(3, 3), [new FsLineDiagonal1(3), new FsLineDiagonal2(3), new FsLineHorizontal(3), new FsLineVertical(3)]);
+            this.fsGame = new FsGame(new FsBoard(3, 3), [new FsLineDiagonal1(3), new FsLineDiagonal2(3), new FsLineHorizontal(3), new FsLineVertical(3)], isMisere);
         } else if (gameType === "ttt_4") {
-            this.fsGame = new FsGame(new FsBoard(4, 4), [new FsLineDiagonal1(4), new FsLineDiagonal2(4), new FsLineHorizontal(4), new FsLineVertical(4), new FsSquare(2)]);
+            this.fsGame = new FsGame(new FsBoard(4, 4), [new FsLineDiagonal1(4), new FsLineDiagonal2(4), new FsLineHorizontal(4), new FsLineVertical(4), new FsSquare(2)], isMisere);
         } else {
             throw "Unsupported game type";
         }
         this.aiPlayers = [null, null];
-        if (playerType1 === "ai") {
+        let model = gameConfigurationModel(gameType, isMisere);
+        if (isAiPlayer1 && model !== null) {
             this.aiPlayers[0] = new AiPlayer(model, 1);
         }
-        if (playerType2 === "ai") {
+        if (isAiPlayer2 && model !== null) {
             this.aiPlayers[1] = new AiPlayer(model, 2);
         }
     }
@@ -98,16 +90,25 @@ class AiPlayer {
     }
 }
 
+function gameConfigurationModel(gameType, isMisere) {
+    if (isMisere) return null;
+    if (gameType === "ttt") return modelTtt;
+    if (gameType === "ttt_4") return modelTtt4;
+    return null;
+}
+
 function newGame() {
     if (!preventUserActions) {
         let boardContainer = document.getElementById("board_container");
         while (boardContainer.firstChild) {
             boardContainer.removeChild(boardContainer.lastChild);
         }
+        refreshSupportedAiConfigurations();
         let gameType = document.getElementById("game_type").value;
-        let playerType1 = document.getElementById("player_type_1").value;
-        let playerType2 = document.getElementById("player_type_2").value;
-        currentGame = new Game(gameType, playerType1, playerType2);
+        let isMisere = document.getElementById("misere").checked;
+        let isAiPlayer1 = document.getElementById("ai_player_1").checked;
+        let isAiPlayer2 = document.getElementById("ai_player_2").checked;
+        currentGame = new Game(gameType, isMisere, isAiPlayer1, isAiPlayer2);
 
         let tableBoard = document.createElement("table");
 
@@ -150,9 +151,10 @@ function uiMove(piece, locTd) {
         if (fsGame.state === 0) {
             setGameInformation("Draw!");
         } else {
-            for (let loc of fsGame.winCondition.locations) {
+            for (let loc of fsGame.endCondition.locations) {
                 let tableData = document.getElementById(LOCATION_ID_PREFIX + loc.row + "_" + loc.column);
-                tableData.classList.add("win");
+                let classValue = fsGame.isMisere ? "loss" : "win";
+                tableData.classList.add(classValue);
             }
             setGameInformation(PIECE_DISPLAY[fsGame.state] + " wins!");
         }
@@ -199,6 +201,23 @@ function setPlayerToMove() {
     setGameInformation("Player to move: " + PIECE_DISPLAY[currentGame.fsGame.pieceToMove]);
 }
 
+function refreshSupportedAiConfigurations() {
+    let gameType = document.getElementById("game_type").value;
+    let isMisere = document.getElementById("misere").checked;
+    let aiPlayer1 = document.getElementById("ai_player_1");
+    let aiPlayer2 = document.getElementById("ai_player_2");
+    if (gameConfigurationModel(gameType, isMisere) === null) {
+        aiPlayer1.disabled = true;
+        aiPlayer2.disabled = true;
+        aiPlayer1.checked = false;
+        aiPlayer2.checked = false;
+    }
+    else {
+        aiPlayer1.disabled = false;
+        aiPlayer2.disabled = false;
+    }
+}
+
 async function loadModelsAsync() {
     modelTtt = await tf.loadLayersModel("ttt_model/model.json");
     modelTtt4 = await tf.loadLayersModel("ttt_4_model/model.json");
@@ -213,7 +232,16 @@ async function loadModelsAsync() {
 }
 
 (async () => {
-    await loadModelsAsync();
+    try
+    {
+        await loadModelsAsync();
+    }
+    catch {
+        console.error("ai models could not be loaded");
+    }
 
+    document.getElementById("game_type").addEventListener('change', refreshSupportedAiConfigurations);
+    document.getElementById("misere").addEventListener('change', refreshSupportedAiConfigurations);
+    refreshSupportedAiConfigurations();
     newGame();
 })();
