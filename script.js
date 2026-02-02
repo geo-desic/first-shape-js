@@ -3,9 +3,19 @@ const EVALUATION_EPSILON = 0.25;
 const LOCATION_ID_PREFIX = "fs_loc_";
 const PIECE_DISPLAY = ["", "X", "O"];
 var currentGame = null;
-var modelTtt = null;
-var modelTtt4 = null;
+const models = [];
 var preventUserActions = false;
+
+class ModelDetails {
+    constructor(gameType, isMisere, inputSize, path) {
+        this.gameType = gameType;
+        this.isMisere = isMisere;
+        this.inputSize = inputSize;
+        this.path = path;
+        this.model = null;
+        this.modelLoaded = false;
+    }
+}
 
 class Game {
     constructor(gameType, isMisere, isAiPlayer1, isAiPlayer2) {
@@ -13,9 +23,9 @@ class Game {
         this.isMisere = isMisere;
         this.isAiPlayer1 = isAiPlayer1;
         this.isAiPlayer2 = isAiPlayer2;
-        if (gameType === "ttt") {
+        if (gameType === "3x3l") {
             this.fsGame = new FsGame(new FsBoard(3, 3), [new FsLineDiagonal1(3), new FsLineDiagonal2(3), new FsLineHorizontal(3), new FsLineVertical(3)], isMisere);
-        } else if (gameType === "ttt_4") {
+        } else if (gameType === "4x4ls") {
             this.fsGame = new FsGame(new FsBoard(4, 4), [new FsLineDiagonal1(4), new FsLineDiagonal2(4), new FsLineHorizontal(4), new FsLineVertical(4), new FsSquare(2)], isMisere);
         } else {
             throw "Unsupported game type";
@@ -52,20 +62,24 @@ class AiPlayer {
         let board = fsGame.board;
         let bestEvaluation = null;
         let movesAndEvals = [];
-        let boardArray = boardToArray();
+        let modelInputArray = boardToModelInputArray();
         for (let r = 0; r < board.rows; r++) {
             for (let c = 0; c < board.columns; c++) {
                 if (fsGame.validMove(r, c)) {
                     let i = board.columns * r + c;
-                    boardArray[i] = this.piece;
-                    let modelInput = boardArrayToModelInput(boardArray);
-                    let evaluation = this.model.predict(modelInput).dataSync()[0];
-                    modelInput.dispose();
-                    if (currentGame.gameType === "ttt") {
+                    // model input length is twice the number of board locations
+                    // the first half is dedicated to the locations of the first players pieces and the second half player is for the second player
+                    if (this.piece == 2) i += board.size();
+                    modelInputArray[i] = 1; // temporarily fill to predict this move with the model
+                    let tensor = modelInputArrayToTensor(modelInputArray);
+                    let evaluation = this.model.predict(tensor).dataSync()[0];
+                    tensor.dispose();
+                    if (currentGame.gameType === "3x3l") {
+                        // currently only the 3x3 models are perfect predictors (maximum error less than 0.5) so their predictions can safely be rounded
                         evaluation = Math.round(evaluation);
                     }
-                    boardArray[i] = 0;
-                    if (this.piece === 2) { evaluation = -evaluation; }
+                    modelInputArray[i] = 0; // zero out the temporary move
+                    if (this.piece === 2) { evaluation = -evaluation; } // scores are from the first players perspective but the second players scores are simply the negation
                     movesAndEvals.push([r, c, evaluation]);
                     if (bestEvaluation === null || evaluation > bestEvaluation) {
                         bestEvaluation = evaluation;
@@ -73,6 +87,7 @@ class AiPlayer {
                 }
             }
         }
+        // instead of always picking the move with the highest score, choose from any that are within EVALUATION_EPSILON of the maximum score
         let lowCutoff = bestEvaluation - EVALUATION_EPSILON;
         let i = 0;
         while (i < movesAndEvals.length) {
@@ -91,9 +106,9 @@ class AiPlayer {
 }
 
 function gameConfigurationModel(gameType, isMisere) {
-    if (isMisere) return null;
-    if (gameType === "ttt") return modelTtt;
-    if (gameType === "ttt_4") return modelTtt4;
+    for (let modelDetails of models) {
+        if (modelDetails.gameType === gameType && modelDetails.isMisere === isMisere) return modelDetails.model;
+    }
     return null;
 }
 
@@ -163,21 +178,21 @@ function uiMove(piece, locTd) {
     }
 }
 
-function boardToArray() {
+function boardToModelInputArray() {
     let result = [];
     let board = currentGame.fsGame.board;
-    for (let r = 0; r < board.rows; r++) {
-        for (let c = 0; c < board.columns; c++) {
-            let piece = board.locations[r][c].piece;
-            if (piece === null) { piece = 0; }
-            result.push(piece);
+    for (let p = 1; p <= 2; p++) {
+        for (let r = 0; r < board.rows; r++) {
+            for (let c = 0; c < board.columns; c++) {
+                result.push(p === board.locations[r][c].piece ? 1 : 0)
+            }
         }
     }
     return result;
 }
 
-function boardArrayToModelInput(boardArray) {
-    return tf.tensor(boardArray, [1, currentGame.fsGame.board.size()]);
+function modelInputArrayToTensor(values) {
+    return tf.tensor(values, [1, values.length]);
 }
 
 function performAiMoves() {
@@ -218,27 +233,35 @@ function refreshSupportedAiConfigurations() {
     }
 }
 
-async function loadModelsAsync() {
-    modelTtt = await tf.loadLayersModel("ttt_model/model.json");
-    modelTtt4 = await tf.loadLayersModel("ttt_4_model/model.json");
+async function loadModelAsync(modelDetails) {
+    try {
+        modelDetails.modelLoaded = true;
+        modelDetails.model = await tf.loadGraphModel(modelDetails.path);
 
-    // warm up models
-    const zeros9 = tf.zeros([1, 9]);
-    const zeros16 = tf.zeros([1, 16]);
-    modelTtt.predict(zeros9);
-    modelTtt4.predict(zeros16);
-    zeros9.dispose();
-    zeros16.dispose();
+        // warm up model
+        const zeros = tf.zeros([1, modelDetails.inputSize]);
+        modelDetails.model.predict(zeros);
+        zeros.dispose();
+    }
+    catch(e) {
+        console.error(`error loading tfjs model: gameType = ${modelDetails.gameType}, isMisere = ${modelDetails.isMisere}`);
+        console.log(e.message);
+    }
+}
+
+async function loadModelsAsync() {
+    for (let modelDetails of models) {
+        await loadModelAsync(modelDetails);
+    }
 }
 
 (async () => {
-    try
-    {
-        await loadModelsAsync();
-    }
-    catch {
-        console.error("ai models could not be loaded");
-    }
+    models.push(new ModelDetails("3x3l", false, 18, "models/fs-3x3-l/model.json"));    // 3x3 with lines
+    models.push(new ModelDetails("3x3l", true, 18, "models/fs-3x3-l-m/model.json"));   // 3x3 with lines misere
+    models.push(new ModelDetails("4x4ls", false, 32, "models/fs-4x4-ls/model.json"));  // 4x4 with lines and squares
+    models.push(new ModelDetails("4x4ls", true, 32, "models/fs-4x4-ls-m/model.json")); // 4x4 with lines and squares misere
+
+    await loadModelsAsync();
 
     document.getElementById("game_type").addEventListener('change', refreshSupportedAiConfigurations);
     document.getElementById("misere").addEventListener('change', refreshSupportedAiConfigurations);

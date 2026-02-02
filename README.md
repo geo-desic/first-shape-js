@@ -18,7 +18,7 @@ The name First Shape was chosen as a general term to represent any board game wh
 
 - Each player has a single unique piece type
 - Pieces cannot be moved/removed once played
-- The objective is (or in the misere version <strong>is not</strong>) to be the first player to form one of the "winning" shapes on the board with their pieces
+- The objective is (or in the misere version <strong>is not</strong>) to be the first player to form one of the game ending shapes on the board with their pieces
 
 #### Examples:
 - [Tic Tac Toe](https://en.wikipedia.org/wiki/Tic-tac-toe)
@@ -27,17 +27,21 @@ The name First Shape was chosen as a general term to represent any board game wh
 - [Connect 4](https://en.wikipedia.org/wiki/Connect_Four)
 - [Gomoku](https://en.wikipedia.org/wiki/Gomoku)
 
-The winning shapes for the games above are mostly horizontal, vertical, and diagonal lines of a specific length. However, notice squares are included in the second and [polyominos](https://en.wikipedia.org/wiki/Polyomino) are used in the third. In general, any set of shapes could be used but likely need to be chosen carefully in conjunction with the board in order for the game to be deemed "fair" and "fun". For example, try playing Tic Tac Toe on a 3x4 board with the same winning shapes used in a 3x3 board (i.e. horizontal, vertical, and diagonal lines of length 3). It will become obvious fairly quickly that the game is unfair because the first player can always win. Or try playing Tic Tac Toe on a 6x6 board with lines of length 6. It will become boring quickly as it is too easy to force a draw.
+The game ending shapes for the examples above are mostly horizontal, vertical, and diagonal lines of a specific length. However, notice squares are included in the second and [polyominos](https://en.wikipedia.org/wiki/Polyomino) are used in the third. In general, any set of shapes could be used but likely need to be chosen carefully in conjunction with the board in order for the game to be deemed "fair" and "fun". For example, try playing Tic Tac Toe on a 3x4 board with the same winning shapes used in a 3x3 board (i.e. horizontal, vertical, and diagonal lines of length 3). It will become obvious fairly quickly that the game is unfair because the first player can always win. Or try playing Tic Tac Toe on a 6x6 board with lines of length 6. It will become boring quickly as it is too easy to force a draw.
 
-## Pertinent Files
+## Pertinent Files / Directories
 - [index.html](index.html) contains the html code
 - [first_shape.js](first_shape.js) contains a minimal implementation of the first shape game
-- [script.js](script.js) contains the code to load the neural network models and interact with the html
-- [ttt_model](ttt_model) and [ttt_4_model](ttt_4_model) are directories containing the neural network models
-- [ttt_zip](https://github.com/geo-desic/public-data/blob/master/first-shape/ttt.zip) and [ttt_4_sq.zip](https://github.com/geo-desic/public-data/blob/master/first-shape/ttt_4_sq.zip) contain the data used to train the neural networks
+- [script.js](script.js) contains the code to utilize the tensorflowjs models and interact with the html
+- [models](models) has subdirectories containing the tensorflowjs (graph) models
+  - [fs-3x3-l](models/fs-3x3-l) - Tic Tac Toe
+  - [fs-3x3-l-m](models/fs-3x3-l-m) - Misere Tic Tac Toe
+  - [fs-4x4-ls](models/fs-4x4-ls) - 4x4 Tic Tac Toe With Squares
+  - [fs-4x4-ls-m](models/fs-4x4-ls-m) - Misere 4x4 Tic Tac Toe With Squares
+- [public-data/first-shape](https://github.com/geo-desic/public-data/tree/main/first-shape) has subdirectories containing compressed versions of the keras models and the data used to train them
 
 ## AI Information
-Neural network models were created for the standard (non-misere) versions of:
+Neural network models were created for both standard and misere versions of:
 - Tic Tac Toe
 - 4x4 Tic Tac Toe With Squares
 
@@ -56,7 +60,7 @@ Score | Definition
 
 The score for any non-leaf state is defined by the final state score that is optimal both players. That is, the final state score that is both maximal for player 1 and minimal for player 2 (i.e. perfect play).
 
-#### Examples:
+#### Examples for Tic Tac Toe (non-misere)
 
 ---------------------------
 __Draw__
@@ -96,7 +100,7 @@ Board: [1, 2, 0, 1, 1, 2, 0, 0, 0]
 
 ---------------------------
 
-The two games currently included in this project are small enough that the exact score could be determined for every unique board position. However, note that for boards even slightly larger then these this would not be feasible and a heuristic approach would likely be required. This is because the number of unique board states increases significantly with the board size. The counts below do not take into account any type of board symmetry.
+The games currently included in this project are small enough that the exact score could be determined for every unique board state. However, note that for boards even slightly larger then these this would not be feasible and a heuristic approach would likely be required. This is because the number of unique board states increases significantly with the board size. The counts below do not take into account any type of board symmetry.
 
 Game | Unique Board States
 ---- | -------------------
@@ -104,18 +108,21 @@ Game | Unique Board States
 4x4 Tic Tac Toe With Squares | 9364904
 
 ### Neural Networks
-Once the necessary data was generated, the models were trained using the board representation defined above as input and the score as output. [TensorFlow](https://www.tensorflow.org) was the machine learning platform used which makes it extremely easy to save models for use in javascript. While the model design and training code isn't included here, it was not very complicated. Both contained 2 to 3 two dimensional convolutional layers followed by 2 to 3 dense layers. This design is likely not optimal, but worked well enough to achieve the desired goal of strong play.
+Once the necessary data was generated, the models were trained using a slightly modified version of the board representation defined above as input and the score as output. [TensorFlow](https://www.tensorflow.org) was the machine learning platform used which makes it extremely easy to save models for use in javascript. While the model design and training code isn't included here, it was not very complicated (3-4 dense layers). This design is likely not optimal, but worked well enough to achieve the desired goal of strong play.
 
 #### AI Strength
-The AI for 3x3 Tic Tac Toe is believed to be perfect (#). The AI for 4x4 Tic Tac Toe With Squares is strong but not perfect. Given the large size of the dataset, the model training process took a while especially on the older hardware used. A future goal is to tweak the model a bit, without significantly increasing the resultant file size, and retrain on upgraded hardware hopefully making it perfect as well.
+The AI for 3x3 Tic Tac Toe (both standard and misere) is believed to be perfect (#). The AI for 4x4 Tic Tac Toe With Squares is strong but not perfect. Given the large size of the dataset, the model training process took a while especially on the older hardware used. A future goal is to tweak the model a bit, without significantly increasing the resultant file size, and retrain on upgraded hardware hopefully making it perfect as well.
 
-(#) This relies upon the assumption that the datasets, [ttt_zip](https://github.com/geo-desic/public-data/blob/master/first-shape/ttt.zip) and [ttt_4_sq.zip](https://github.com/geo-desic/public-data/blob/master/first-shape/ttt_4_sq.zip), used to train the models were both entirely accurate and comprehensive (i.e. include all unique board states). This is believed to be true, however it should not be difficult to independently verify.
+(#) This relies upon the assumption that the datasets (e.g. [fs-3x3-l/data.zip](https://github.com/geo-desic/public-data/blob/main/first-shape/fs-3x3-l/data.zip)) used to train the models were both entirely accurate and comprehensive (i.e. include all unique board states). This is believed to be true, however it should not be difficult to independently verify.
 
-Statistics were gathered during the model training process shown below. With respect to proving perfect play, the most important of these is maximum absolute error. This is the largest absolute difference between an actual and predicted score spanning the entire dataset. If e is the maximum absolute error, then all predictions are contained in an interval (potentially multiple) of the form [N - e, N + e] where N is an integer (all actual scores are integers). As long as e is small enough, less than 0.5, all of these intervals are disjoint and each prediction is contained in exactly one interval. In that case, the actual score can be determined from the prediction simply by rounding to the nearest integer. This makes the model a perfect predictor and the AI will play perfectly. The maximum absolute error for the 3x3 Tic Tac Toe model is well below this threshold.
+Statistics were gathered during the model training process shown below. With respect to proving perfect play, the most important of these is maximum absolute error. This is the largest absolute difference between an actual and predicted score spanning the entire dataset. If e is the maximum absolute error, then all predictions are contained in an interval (potentially multiple) of the form [N - e, N + e] where N is an integer (all actual scores are integers). As long as e is small enough, less than 0.5, all of these intervals are disjoint and each prediction is contained in exactly one interval. In that case, the actual score can be determined from the prediction simply by rounding to the nearest integer. This makes the model a perfect predictor and the AI will play perfectly. The maximum absolute error for the 3x3 Tic Tac Toe models (both standard and misers) are below this threshold.
 
 Model | Maximum Absolute Error | [MAE](https://en.wikipedia.org/wiki/Mean_absolute_error) | [MSE](https://en.wikipedia.org/wiki/Mean_squared_error)
 ----- | ---------------------- | ------------------- | ------------------
-ttt_model | 0.0897 | 0.0014 | 0.00001
+fs-3x3-l | 0.2488 | 0.0255 | 0.0012
+fs-3x3-l-m | 0.1936 | 0.0364 | 0.0022
+fs-4x4-ls | 6.733 | 0.0850 | 0.0441
+fs-3x3-ls-m | 4.0220 | 0.0840 | 0.0359
 
 ## Why is this interesting?
 - The AI code is extremely simple: use the trained model to predict the score after all valid moves and choose a move that results in the "best" score (i.e. highest score for player 1 or lowest score for player 2)
@@ -124,5 +131,5 @@ ttt_model | 0.0897 | 0.0014 | 0.00001
 - While common brute force approaches to game AI such as the [minimax](https://en.wikipedia.org/wiki/Minimax) algorithm are extremely resource (CPU) intensive during game play and require highly optimized code, this approach does not
   - One way to think about it is most of that complex analysis was performed prior to game play and trained into the models
 - A model can accurately make predictions while its size may be significantly smaller than the actual data used to train it
-  - Example: ttt_4_sq.csv is 412MB but ttt_4_model is approximately 8MB (and it's highly likely this could be reduced further)
+  - Example: [fs-4x4-ls/data.zip](https://github.com/geo-desic/public-data/blob/main/first-shape/fs-4x4-ls/data.zip) is roughly 75MB (422MB uncompressed) but its tensorflowjs model [fs-4x4-ls](models/fs-4x4-ls) is less than 4MB (and it's highly likely this could be reduced further)
 
