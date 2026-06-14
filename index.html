@@ -1,6 +1,9 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>First Shape</title>
     <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
@@ -10,50 +13,28 @@
         <p id="game_information" class="fs-text">Loading...</p>
         <div id="board_container" class="fs-board"></div>
         <div class="fs-options">
-            <table>
-                <tr>
-                    <td>
-                        <label for="game_type">Game Type</label>
-                    </td>
-                    <td>
-                        <select id="game_type">
-                            <option value="3x3l">Standard Tic Tac Toe</option>
-                            <option value="4x4ls" selected>4x4 Tic Tac Toe With Squares</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <label for="misere">Misere</label>
-                    </td>
-                    <td>
-                        <input type="checkbox" id="misere" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <label for="ai_player_1">AI Player 1</label>
-                    </td>
-                    <td>
-                        <input type="checkbox" id="ai_player_1" checked />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <label for="ai_player_2">AI Player 2</label>
-                    </td>
-                    <td>
-                        <input type="checkbox" id="ai_player_2" />
-                    </td>
-                </tr>
-                <tr style="padding-top: 20px;">
-                    <td>
-                    </td>
-                    <td>
-                        <button type="button" onclick="newGame()">New Game</button>
-                    </td>
-                </tr>
-            </table>
+            <div class="fs-option">
+                <label for="game_type">Game Type</label>
+                <select id="game_type">
+                    <option value="3x3l">Standard Tic Tac Toe</option>
+                    <option value="4x4ls" selected>4x4 Tic Tac Toe With Squares</option>
+                </select>
+            </div>
+            <div class="fs-option">
+                <label for="misere">Misere</label>
+                <input type="checkbox" id="misere" />
+            </div>
+            <div class="fs-option">
+                <label for="ai_player_1">AI Player 1</label>
+                <input type="checkbox" id="ai_player_1" checked />
+            </div>
+            <div class="fs-option">
+                <label for="ai_player_2">AI Player 2</label>
+                <input type="checkbox" id="ai_player_2" />
+            </div>
+            <div class="fs-option fs-option-action">
+                <button type="button" id="new_game">New Game</button>
+            </div>
         </div>
     </div>
     <script src="first_shape.js"></script>

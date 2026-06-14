@@ -1,64 +1,120 @@
+:root {
+   --bg: #ffffff;
+   --text: #222222;
+   --cell-bg: #ffffff;
+   --cell-border: #222222;
+   --cell-hover: #ededed;
+   --win: #1a7f37;
+   --loss: #d11a2a;
+   --focus: #2563eb;
+}
+
+@media (prefers-color-scheme: dark) {
+   :root {
+      --bg: #121212;
+      --text: #eaeaea;
+      --cell-bg: #1e1e1e;
+      --cell-border: #5a5a5a;
+      --cell-hover: #2c2c2c;
+      --win: #4ade80;
+      --loss: #ff6b6b;
+      --focus: #66aaff;
+   }
+}
+
 body {
    font-family: 'Permanent Marker', cursive;
-   width: 100%;
-}
-
-td.loss {
-   color: red;
-}
-
-td.win {
-   color: green;
+   background-color: var(--bg);
+   color: var(--text);
+   margin: 0;
 }
 
 .fs-game {
    margin: auto;
+   padding: 1rem;
    text-align: center;
-   width: 480px;
+   width: min(90vw, 520px);
 }
 
 .fs-text {
-   font-size: 30px;
+   font-size: clamp(1.5rem, 6vw, 2rem);
 }
 
+/* Board: a square CSS grid; column count is set at runtime via --cols */
 .fs-board {
-   width: 100%;
+   display: grid;
+   grid-template-columns: repeat(var(--cols, 3), 1fr);
+   gap: 8px;
+   width: min(90vw, 480px);
+   margin: 1rem auto;
 }
 
-.fs-board table {
-   margin: auto;
-}
-
-.fs-board table td {
-   border: 1px solid;
+.fs-cell {
+   aspect-ratio: 1;
+   padding: 0;
+   border: 2px solid var(--cell-border);
    border-radius: 10px;
-   height: 120px;
-   width: 120px;
-   text-align: center;
-   font-size: 80px;
+   background-color: var(--cell-bg);
+   color: var(--text);
+   font-family: inherit;
+   font-size: clamp(2rem, 12vw, 5rem);
+   line-height: 1;
+   cursor: pointer;
 }
 
-.fs-options table {
-   margin-left: auto;
-   margin-right: auto;
+.fs-cell:not(:disabled):hover {
+   background-color: var(--cell-hover);
 }
 
-.fs-options table tr td {
-   padding: 10px;
+.fs-cell:focus-visible {
+   outline: 3px solid var(--focus);
+   outline-offset: 2px;
 }
 
-@media screen and (max-width: 600px) {
-   .fs-game {
-      width: 320px;
-   }
+.fs-cell:disabled {
+   cursor: default;
+   color: var(--text);
+   opacity: 1;
+}
 
-   .fs-text {
-      font-size: 4vw;
-   }
+/* win/loss must follow :disabled so they win the equal-specificity tie */
+.fs-cell.win {
+   color: var(--win);
+}
 
-   .fs-board table td {
-      height: 15vw;
-      width: 15vw;
-      font-size: 10vw;
-   }
+.fs-cell.loss {
+   color: var(--loss);
+}
+
+/* Options form */
+.fs-options {
+   display: flex;
+   flex-direction: column;
+   gap: 0.75rem;
+   max-width: 360px;
+   margin: 1.5rem auto 0;
+}
+
+.fs-option {
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   gap: 1rem;
+}
+
+.fs-option-action {
+   justify-content: center;
+   margin-top: 0.5rem;
+}
+
+.fs-options select,
+.fs-options button {
+   font-family: inherit;
+   font-size: 1rem;
+   cursor: pointer;
+}
+
+.fs-options button {
+   padding: 0.5rem 1.5rem;
+   border-radius: 8px;
 }

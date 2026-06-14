@@ -2,9 +2,9 @@ const AI_AI_DELAY_MS = 500;
 const EVALUATION_EPSILON = 0.25;
 const LOCATION_ID_PREFIX = "fs_loc_";
 const PIECE_DISPLAY = ["", "X", "O"];
-var currentGame = null;
+let currentGame = null;
 const models = [];
-var preventUserActions = false;
+let preventUserActions = false;
 
 class ModelDetails {
     constructor(gameType, isMisere, inputSize, path) {
@@ -125,21 +125,21 @@ function newGame() {
         let isAiPlayer2 = document.getElementById("ai_player_2").checked;
         currentGame = new Game(gameType, isMisere, isAiPlayer1, isAiPlayer2);
 
-        let tableBoard = document.createElement("table");
+        let board = currentGame.fsGame.board;
+        boardContainer.style.setProperty("--cols", board.columns);
 
-        for (let r = 0; r < currentGame.fsGame.board.rows; r++) {
-            let tableRow = document.createElement("tr");
-            tableBoard.appendChild(tableRow);
-            for (let c = 0; c < currentGame.fsGame.board.columns; c++) {
-                let tableData = document.createElement("td");
-                tableData.addEventListener("click", locationClicked);
-                tableData.id = LOCATION_ID_PREFIX + r + "_" + c;
-                tableData.setAttribute("data-row", r);
-                tableData.setAttribute("data-column", c);
-                tableRow.appendChild(tableData);
+        for (let r = 0; r < board.rows; r++) {
+            for (let c = 0; c < board.columns; c++) {
+                let cell = document.createElement("button");
+                cell.type = "button";
+                cell.className = "fs-cell";
+                cell.addEventListener("click", locationClicked);
+                cell.id = LOCATION_ID_PREFIX + r + "_" + c;
+                cell.setAttribute("data-row", r);
+                cell.setAttribute("data-column", c);
+                boardContainer.appendChild(cell);
             }
         }
-        boardContainer.appendChild(tableBoard);
         setPlayerToMove();
         performAiMoves();
     }
@@ -159,17 +159,18 @@ function locationClicked() {
     }
 }
 
-function uiMove(piece, locTd) {
-    locTd.innerText = PIECE_DISPLAY[piece];
+function uiMove(piece, cell) {
+    cell.innerText = PIECE_DISPLAY[piece];
+    cell.disabled = true; // occupied cells are no longer playable
     let fsGame = currentGame.fsGame;
     if (fsGame.state >= 0) { // game finished
         if (fsGame.state === 0) {
             setGameInformation("Draw!");
         } else {
             for (let loc of fsGame.endCondition.locations) {
-                let tableData = document.getElementById(LOCATION_ID_PREFIX + loc.row + "_" + loc.column);
+                let endConditionCell = document.getElementById(LOCATION_ID_PREFIX + loc.row + "_" + loc.column);
                 let classValue = fsGame.isMisere ? "loss" : "win";
-                tableData.classList.add(classValue);
+                endConditionCell.classList.add(classValue);
             }
             setGameInformation(PIECE_DISPLAY[fsGame.state] + " wins!");
         }
@@ -250,9 +251,8 @@ async function loadModelAsync(modelDetails) {
 }
 
 async function loadModelsAsync() {
-    for (let modelDetails of models) {
-        await loadModelAsync(modelDetails);
-    }
+    // each loadModelAsync handles its own errors, so one failure won't reject the batch
+    await Promise.all(models.map(loadModelAsync));
 }
 
 (async () => {
@@ -265,6 +265,7 @@ async function loadModelsAsync() {
 
     document.getElementById("game_type").addEventListener('change', refreshSupportedAiConfigurations);
     document.getElementById("misere").addEventListener('change', refreshSupportedAiConfigurations);
+    document.getElementById("new_game").addEventListener('click', newGame);
     refreshSupportedAiConfigurations();
     newGame();
 })();
