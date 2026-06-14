@@ -261,11 +261,12 @@ async function loadModelsAsync() {
     models.push(new ModelDetails("4x4ls", false, 32, "models/fs-4x4-ls/model.json"));  // 4x4 with lines and squares
     models.push(new ModelDetails("4x4ls", true, 32, "models/fs-4x4-ls-m/model.json")); // 4x4 with lines and squares misere
 
-    await loadModelsAsync();
-
     document.getElementById("game_type").addEventListener('change', refreshSupportedAiConfigurations);
     document.getElementById("misere").addEventListener('change', refreshSupportedAiConfigurations);
     document.getElementById("new_game").addEventListener('click', newGame);
+
+    await loadModelsAsync();
+
     refreshSupportedAiConfigurations();
     newGame();
 })();
